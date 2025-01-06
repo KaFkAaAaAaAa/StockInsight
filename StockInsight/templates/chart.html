@@ -1,0 +1,186 @@
+{#
+TODO: Add selectboxes for currencies and button for swithing them
+#}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<body>
+    <div id="chart">
+        <canvas id="stock-chart"></canvas>
+    </div>
+
+    <!-- Buttons to change window -->
+    <div id="window-buttons">
+        {% for window in available_windows %}
+            <button onclick="changeWindow('{{ window }}')">{{ window }}</button>
+        {% endfor %}
+    </div>
+    
+
+    {% block javascript %}
+    <script>
+        function changeWindow(timeWindow) {
+            const search = '{{ search }}';
+            let url;
+            // When on the dashboard page it redirects to the currency page
+            if (window.location.href.includes('dashboard')) {
+                url = `../currencies/currency/${search}/${timeWindow}/`;
+            } else {
+                url = `../../../currency/${search}/${timeWindow}/`;
+            }
+            window.location.href = url;
+        }
+        
+        // Chart.js
+        let stockData = {{ stock_data|safe }};
+        let stockDataJson;
+        try {
+            stockDataJson = JSON.parse('{{ stock_data_json|escapejs }}');
+            if (!Array.isArray(stockDataJson)) stockDataJson = [];
+        } catch (_) {
+            stockDataJson = [];
+        }
+    
+        const search = '{{ search }}';
+        const currencies = search.split('-');
+    
+        const currencySymbols = {
+            "USD": "$",
+            "EUR": "€",
+            "GBP": "£",
+            "JPY": "¥",
+            "AUD": "A$",
+            "CAD": "C$",
+            "CHF": "CHF",
+            "CNY": "¥",
+            "NZD": "NZ$",
+            "BTC": "₿",
+            "ETH": "Ξ",
+            "XRP": "XRP",
+            "BCH": "BCH",
+            "ADA": "₳",
+            "DOT": "DOT",
+            "BNB": "BNB",
+            "USDT": "₮"
+        };
+    
+        const currencyNames = {
+            "USD": "US Dollar",
+            "EUR": "Euro",
+            "GBP": "British Pound",
+            "JPY": "Japanese Yen",
+            "AUD": "Australian Dollar",
+            "CAD": "Canadian Dollar",
+            "CHF": "Swiss Franc",
+            "CNY": "Chinese Yuan",
+            "NZD": "New Zealand Dollar",
+            "BTC": "Bitcoin",
+            "ETH": "Ethereum",
+            "LTC": "Litecoin",
+            "XRP": "Ripple",
+            "BCH": "Bitcoin Cash",
+            "ADA": "Cardano",
+            "DOT": "Polkadot",
+            "BNB": "Binance Coin",
+            "USDT": "Tether"
+        };
+    
+        const fromCurrency = currencyNames[currencies[0]] || currencies[0];
+        const toCurrency = currencyNames[currencies[1]] || currencies[1];
+        const chartLabel = `${fromCurrency} to ${toCurrency}`;
+        const currencySymbol = currencySymbols[currencies[1]] || '';
+    
+        let borderColor;
+        if (stockData.length > 1) {
+            const firstValue = stockData[0].price;
+            const lastValue = stockData[stockData.length - 1].price;
+            if (lastValue > firstValue) {
+                borderColor = 'rgb(96,243,96)'; // Green
+            } else if (lastValue < firstValue) {
+                borderColor = 'rgb(255,63,63)'; // Red
+            } else {
+                borderColor = 'rgb(99,99,255)'; // Blue
+            }
+        } else {
+            borderColor = 'rgba(99,99,255,1)'; // Default to Blue if not enough data
+        }
+    
+        const timeUnit = {
+            '1d': 'hour',
+            '5d': 'day',
+            '1m': 'day',
+            '6m': 'week',
+            '1y': 'month',
+            '5y': 'year'
+        }['{{ window }}'] || 'hour';
+    
+        const stepSize = {
+            '1d': 1,
+            '5d': 1,
+            '1m': 1,
+            '6m': 1,
+            '1y': 1,
+            '5y': 1
+        }['{{ window }}'] || 1;
+    
+        const ctx = document.getElementById('stock-chart').getContext('2d');
+        const stockChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: stockData.map(data => new Date(data.timestamp)),
+                datasets: [{
+                    label: chartLabel,
+                    data: stockData.map(data => data.price),
+                    borderColor: borderColor,
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: timeUnit,
+                            stepSize: stepSize,
+                            tooltipFormat: 'MMM dd, yyyy HH:mm'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Price'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return currencySymbol + value.toFixed(2);
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.dataset.label || '';
+                                const value = context.raw.toFixed(2);
+                                const time = new Date(context.label).toLocaleString();
+                                return `${label}: ${currencySymbol}${value} (${time})`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+    {% endblock %}
+</body>
+</html>
