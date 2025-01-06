@@ -1,4 +1,8 @@
-body{
-    background-color: cadetblue;
-    color: white;
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    /*background: url("/media/images/background_photo.jpg") no-repeat fixed 60%;*/
 }
