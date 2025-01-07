@@ -3,6 +3,7 @@ import requests
 import json
 from datetime import datetime, timedelta
 
+
 class StockData(models.Model):
     timestamp = models.DateTimeField()
     price = models.FloatField()
@@ -46,13 +47,16 @@ class StockData(models.Model):
 
     @staticmethod
     def get_currencies():
-        return ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "CNY", "NZD", "BTC", "ETH", "XRP", "BCH", "ADA", "DOT", "BNB", "USDT"]
+        return ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "CNY", "NZD", "BTC", "ETH", "XRP", "BCH", "ADA", "DOT",
+                "BNB", "USDT"]
+
 
 class Article(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
 
     objects = models.Manager()
+
 
 class Currency(models.Model):
     name = models.CharField(max_length=50)

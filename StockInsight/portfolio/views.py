@@ -30,14 +30,19 @@ def dashboard_view(request, window="1d"):
     stock_data = StockData.fetch_and_process_data(search, window)
     stock_data_json = json.dumps(stock_data) if stock_data else '[]'
     available_windows = StockData.get_available_windows()
-
-    return render(request, 'dashboard.html', {
+    available_currencies = StockData.get_currencies()
+    currencies = search.split('-')
+    context = {
         'search': search,
         'window': window,
         'stock_data': stock_data,
         'stock_data_json': stock_data_json,
-        'available_windows': available_windows
-    })
+        'available_currencies': available_currencies,
+        'available_windows': available_windows,
+        'from_currency': currencies[0],
+        'to_currency': currencies[1],
+    }
+    return render(request, 'dashboard.html', context)
 
 
 @login_required
@@ -45,14 +50,19 @@ def currency_view(request, search, window="1d"):
     stock_data = StockData.fetch_and_process_data(search, window)
     stock_data_json = json.dumps(stock_data) if stock_data else '[]'
     available_windows = StockData.get_available_windows()
-
-    return render(request, 'currencies/currency.html', {
+    available_currencies = StockData.get_currencies()
+    currencies = search.split('-')
+    context = {
         'search': search,
         'window': window,
         'stock_data': stock_data,
         'stock_data_json': stock_data_json,
-        'available_windows': available_windows
-    })
+        'available_currencies': available_currencies,
+        'available_windows': available_windows,
+        'from_currency': currencies[0],
+        'to_currency': currencies[1],
+    }
+    return render(request, 'chart.html', context)
 
 
 @login_required
