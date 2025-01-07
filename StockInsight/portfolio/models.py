@@ -44,6 +44,10 @@ class StockData(models.Model):
     def get_available_windows():
         return ['1d', '5d', '1m', '6m', '1y', '5y']
 
+    @staticmethod
+    def get_currencies():
+        return ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "CNY", "NZD", "BTC", "ETH", "XRP", "BCH", "ADA", "DOT", "BNB", "USDT"]
+
 class Article(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()

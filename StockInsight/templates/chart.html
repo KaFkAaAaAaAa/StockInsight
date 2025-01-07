@@ -1,6 +1,7 @@
-{#
+
+<!--
 TODO: Add selectboxes for currencies and button for swithing them
-#}
+-->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -19,6 +20,12 @@ TODO: Add selectboxes for currencies and button for swithing them
         {% for window in available_windows %}
             <button onclick="changeWindow('{{ window }}')">{{ window }}</button>
         {% endfor %}
+    </div>
+    <div id="currency-selection">
+        <select id="currency-select-1">
+            
+        </select>
+        <select id="currency-select-2"></select>
     </div>
     
 
