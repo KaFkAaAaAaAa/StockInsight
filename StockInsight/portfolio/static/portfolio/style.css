@@ -4,22 +4,36 @@
 }
 
 body {
-    /*background: url("/media/images/background_photo.jpg") no-repeat fixed 60%;*/
-    background-color: black;
+    background: url("../images/background_photo.jpg");
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;
+}
+
+.login_panel{
+    border-radius: 40px;
 }
 
 .short_about{
     background-color: #2DB363;
     color: #FFFFFF;
-
 }
 
+.short_about h2{
+    font-size: 28px;
+}
+
+/*.logo_login{*/
+/*    max-width: 100%;*/
+/*    height: ;*/
+/*}*/
+
 .check_icon{
-    width: 50px;
+    width: 46px;
     height: auto;
 }
 
 .short_login{
     background-color: #FFFFFF;
-
 }
