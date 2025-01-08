@@ -9,6 +9,7 @@ from urllib.parse import urljoin
 import json
 import requests
 from bs4 import BeautifulSoup
+import asyncio
 
 
 def login_view(request):
@@ -67,6 +68,8 @@ def currency_view(request, search, window="1d"):
         'available_windows': available_windows,
         'from_currency': currencies[0],
         'to_currency': currencies[1],
+        # ARTICLES
+        'articles': fetch_articles(search),
     }
     return render(request, 'chart.html', context)
 
@@ -139,8 +142,18 @@ def chart_view(request, search, window):
 # --------------------------------------------
 
 
-def fetch_articles():
-    api_url = "https://eodhd.com/api/news?s=AAPL.US&offset=0&limit=10&api_token=677d6de70b8ae8.08841936&fmt=json"
+def fetch_articles(stocks=None):
+
+    query = "t=financial results"
+    if stocks is not None:
+        query = f"s={stocks.replace("-", ",")}"
+
+    api_url = (f"https://eodhd.com/api/news"
+               f"?{query}"
+               "&offset=0"
+               "&limit=10"
+               "&api_token=677d6de70b8ae8.08841936"
+               "&fmt=json")
     try:
         response = requests.get(api_url)
         response.raise_for_status()
@@ -148,10 +161,6 @@ def fetch_articles():
 
         for i in response_json:
             i['title_image'] = get_website_logo(i['link'])
-
-            print(i['title'])
-            print(i['title_image'])
-            print("--------------------------------------------------------------------------------")
 
         return response_json
     except requests.exceptions.RequestException as e:
@@ -161,22 +170,17 @@ def fetch_articles():
 
 def get_website_logo(url):
     try:
-        # Get the website's HTML content
         response = requests.get(url)
         response.raise_for_status()
         html_content = response.text
 
-        # Parse the HTML content
         soup = BeautifulSoup(html_content, 'html.parser')
 
-        # Look for <link> tags with rel="icon" or rel="shortcut icon"
         icon_link = soup.find("link", rel=lambda x: x and 'icon' in x.lower())
         if icon_link and 'href' in icon_link.attrs:
-            # Build the absolute URL for the logo
             logo_url = urljoin(url, icon_link['href'])
             return logo_url
 
-        # Optionally, look for other possible logo patterns
         meta_logo = soup.find("meta", property="og:image")
         if meta_logo and 'content' in meta_logo.attrs:
             logo_url = urljoin(url, meta_logo['content'])
@@ -186,5 +190,4 @@ def get_website_logo(url):
         print(f"Error fetching the website: {e}")
         return None
 
-        # Return None if no logo was found
     return None
