@@ -1,12 +1,14 @@
-from bs4 import BeautifulSoup
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
-import json
-import requests
 from django.contrib.auth.decorators import login_required
 from .models import StockData
 from django.http import JsonResponse
+
+from urllib.parse import urljoin
+import json
+import requests
+from bs4 import BeautifulSoup
 
 
 def login_view(request):
@@ -147,7 +149,6 @@ def fetch_articles():
         for i in response_json:
             i['title_image'] = get_website_logo(i['link'])
 
-
             print(i['title'])
             print(i['title_image'])
             print("--------------------------------------------------------------------------------")
@@ -160,8 +161,30 @@ def fetch_articles():
 
 def get_website_logo(url):
     try:
-        response = requests.get("https://logo.clearbit.com" + url)
-        html = response.text
-        print(html)
+        # Get the website's HTML content
+        response = requests.get(url)
+        response.raise_for_status()
+        html_content = response.text
+
+        # Parse the HTML content
+        soup = BeautifulSoup(html_content, 'html.parser')
+
+        # Look for <link> tags with rel="icon" or rel="shortcut icon"
+        icon_link = soup.find("link", rel=lambda x: x and 'icon' in x.lower())
+        if icon_link and 'href' in icon_link.attrs:
+            # Build the absolute URL for the logo
+            logo_url = urljoin(url, icon_link['href'])
+            return logo_url
+
+        # Optionally, look for other possible logo patterns
+        meta_logo = soup.find("meta", property="og:image")
+        if meta_logo and 'content' in meta_logo.attrs:
+            logo_url = urljoin(url, meta_logo['content'])
+            return logo_url
+
     except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
+        print(f"Error fetching the website: {e}")
+        return None
+
+        # Return None if no logo was found
+    return None
