@@ -1,7 +1,9 @@
+from bs4 import BeautifulSoup
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 import json
+import requests
 from django.contrib.auth.decorators import login_required
 from .models import StockData
 from django.http import JsonResponse
@@ -41,6 +43,8 @@ def dashboard_view(request, window="1d"):
         'available_windows': available_windows,
         'from_currency': currencies[0],
         'to_currency': currencies[1],
+        # ARTICLES
+        'articles': fetch_articles(),
     }
     return render(request, 'dashboard.html', context)
 
@@ -127,3 +131,37 @@ def chart_view(request, search, window):
         'chart_label': chart_label,
         'currency_symbol': currency_symbol
     })
+
+# --------------------------------------------
+# --------------- FUNCTIONS ------------------
+# --------------------------------------------
+
+
+def fetch_articles():
+    api_url = "https://eodhd.com/api/news?s=AAPL.US&offset=0&limit=10&api_token=677d6de70b8ae8.08841936&fmt=json"
+    try:
+        response = requests.get(api_url)
+        response.raise_for_status()
+        response_json = response.json()
+
+        for i in response_json:
+            i['title_image'] = get_website_logo(i['link'])
+
+
+            print(i['title'])
+            print(i['title_image'])
+            print("--------------------------------------------------------------------------------")
+
+        return response_json
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+        return []
+
+
+def get_website_logo(url):
+    try:
+        response = requests.get("https://logo.clearbit.com" + url)
+        html = response.text
+        print(html)
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
