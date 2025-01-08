@@ -5,4 +5,21 @@
 
 body {
     /*background: url("/media/images/background_photo.jpg") no-repeat fixed 60%;*/
+    background-color: black;
+}
+
+.short_about{
+    background-color: #2DB363;
+    color: #FFFFFF;
+
+}
+
+.check_icon{
+    width: 50px;
+    height: auto;
+}
+
+.short_login{
+    background-color: #FFFFFF;
+
 }
