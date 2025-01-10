@@ -3,13 +3,14 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import StockData
+from .forms import RegisterForm
 from django.http import JsonResponse
 
 from urllib.parse import urljoin
 import json
 import requests
 from bs4 import BeautifulSoup
-import asyncio
+from urllib.parse import urlparse
 
 
 def login_view(request):
@@ -23,6 +24,21 @@ def login_view(request):
         form = AuthenticationForm()
 
     return render(request, 'portfolio/login.html', {'form': form})
+
+def register_view(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = form.save()
+            profile_picture = form.cleaned_data.get('profile_picture')
+            if profile_picture:
+                user.profile.profile_picture = profile_picture
+                user.profile.save()
+            login(request, user)
+            return redirect('dashboard')
+    else:
+        form = RegisterForm()
+    return render(request, 'portfolio/register.html', {'form': form})
 
 
 def portfolio_view(request):
@@ -71,7 +87,7 @@ def currency_view(request, search, window="1d"):
         # ARTICLES
         'articles': fetch_articles(search),
     }
-    return render(request, 'chart.html', context)
+    return render(request, 'currencies/currency.html', context)
 
 
 @login_required
@@ -146,14 +162,16 @@ def fetch_articles(stocks=None):
 
     query = "t=financial results"
     if stocks is not None:
-        query = f"s={stocks.replace("-", ",")}"
+        query = f"s={stocks.split("-")[0]}"
 
     api_url = (f"https://eodhd.com/api/news"
                f"?{query}"
                "&offset=0"
-               "&limit=10"
+               "&limit=5"
                "&api_token=677d6de70b8ae8.08841936"
                "&fmt=json")
+
+    print(api_url)
     try:
         response = requests.get(api_url)
         response.raise_for_status()
@@ -161,6 +179,9 @@ def fetch_articles(stocks=None):
 
         for i in response_json:
             i['title_image'] = get_website_logo(i['link'])
+            print()
+            if urlparse(i['link']).netloc == "finance.yahoo.com":
+                i['title_image'] = "https://upload.wikimedia.org/wikipedia/commons/8/8f/Yahoo%21_Finance_logo_2021.png"
 
         return response_json
     except requests.exceptions.RequestException as e:
