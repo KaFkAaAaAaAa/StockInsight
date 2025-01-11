@@ -11,24 +11,62 @@
 <body>
 <section class="container login_panel">
     <div class="row">
-        <div class="col-6 align-items-center short_about">
-            <img src="{% static 'images/StockInsightLogo.svg' %}" alt="Logo">
-            <img src="{% static 'images/check_icon.png' %}" alt="check" class="check_icon">    <h2>Over 300,000 satisfied users</h2>
-            <img src="{% static 'images/check_icon.png' %}" alt="check" class="check_icon">    <h2>Over 2,000,000 transactions</h2>
-            <img src="{% static 'images/check_icon.png' %}" alt="check" class="check_icon">    <h2>More than 14,000,000$ stolen</h2>
-            <img src="{% static 'images/check_icon.png' %}" alt="check" class="check_icon">    <h2>At least 5,000,000$ hidden with money mules</h2>
+        <div class="col-6 short_about">
+            <div>
+                <img src="{% static 'images/StockInsightLogoWhiteBlue.png' %}" alt="Logo" class="img-fluid p-4 logo_login">
+            </div>
+            <div class="row mt-4">
+                <div class="col-3 text-end">
+                    <img src="{% static 'images/check_icon.png' %}" alt="check" class="check_icon">
+                </div>
+                <div class="col-9">
+                    <h2>Over 300,000 satisfied users</h2>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-3 text-end">
+                    <img src="{% static 'images/check_icon.png' %}" alt="check" class="check_icon">
+                </div>
+                <div class="col-9">
+                    <h2>Over 2,000,000 transactions</h2>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-3 text-end">
+                    <img src="{% static 'images/check_icon.png' %}" alt="check" class="check_icon">
+                </div>
+                <div class="col-9">
+                    <h2>More than 14,000,000$ stolen</h2>
+                </div>
+            </div>
+            <div class="row mt-4 mb-5">
+                <div class="col-3 text-end">
+                    <img src="{% static 'images/check_icon.png' %}" alt="check" class="check_icon">
+                </div>
+                <div class="col-9">
+                    <h2>At least 5,000,000$ hidden with money mules</h2>
+                </div>
+            </div>
         </div>
-        <div class="col-6 text-center short_login">
-            <h1>Sign in</h1>
+        <div class="col-6 text-center short_login align-content-center justify-content-center">
+            <h1 class="mb-4">Sign in</h1>
             <form method="post">
                 {% csrf_token %}
-                <input type="text" id="username" name="username"  placeholder="Email" required>
+                <div class="form-floating mt-3" style="height: auto; width: 50%">
+                    <input type="text" id="username" name="username" class="form-control" placeholder="Email" required>
+                    <label for="username">Email</label>
+                </div>
                 <br>
-                <input type="password" id="password" name="password" placeholder="Password" required>
+                <div class="form-floating mb-3" style="height: auto; width: 50%">
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+                    <label for="password">Password</label>
+                </div>
                 <br>
-                <button type="submit">Sign in</button>
+                <p>You don't have an account? <a href="login.html">Sign up</a></p>
+                <br>
+                <button type="submit" class="btn btn-success btn-lg"
+                        style="background-color: #2DB363">Sign in</button>
             </form>
-            <p>You don't have an account?</p>
         </div>
     </div>
 </section>

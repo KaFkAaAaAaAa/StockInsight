@@ -4,22 +4,30 @@
 }
 
 body {
-    /*background: url("/media/images/background_photo.jpg") no-repeat fixed 60%;*/
-    background-color: black;
+    background-size: auto;
+    background: url("../images/background_photo.jpg") no-repeat top center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;
 }
 
 .short_about{
     background-color: #2DB363;
     color: #FFFFFF;
+    border-radius: 40px 0 0 40px;
+}
 
+.short_about h2{
+    font-size: 28px;
 }
 
 .check_icon{
-    width: 50px;
+    width: 46px;
     height: auto;
 }
 
 .short_login{
     background-color: #FFFFFF;
-
+    border-radius: 0 40px 40px 0;
 }
