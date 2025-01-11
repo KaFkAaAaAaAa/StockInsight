@@ -1,29 +1,38 @@
-from django.contrib.auth import login
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .models import StockData
-from .forms import RegisterForm
-from django.http import JsonResponse
 
-from urllib.parse import urljoin
+from django.contrib import messages
+from .models import StockData
+from .forms import LoginForm
+from .forms import RegisterForm
+from .forms import AccountForm
+from django.http import JsonResponse
+from urllib.parse import urljoin, urlparse
 import json
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urlparse
+
+DISABLE_ARTICLES = True
 
 
 def login_view(request):
-    if request.method == "POST":
-        form = AuthenticationForm(request, data=request.POST)
+    if request.method == 'POST':
+        form = LoginForm(request, data=request.POST)
         if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect('portfolio')
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('dashboard')
     else:
-        form = AuthenticationForm()
-
+        form = LoginForm()
     return render(request, 'portfolio/login.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    return render(request, 'logout.html')
 
 def register_view(request):
     if request.method == 'POST':
@@ -40,6 +49,17 @@ def register_view(request):
         form = RegisterForm()
     return render(request, 'portfolio/register.html', {'form': form})
 
+@login_required
+def account_view(request):
+    if request.method == 'POST':
+        form = AccountForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your profile has been updated successfully.')
+            return redirect('account')
+    else:
+        form = AccountForm(instance=request.user)
+    return render(request, 'portfolio/account.html', {'form': form})
 
 def portfolio_view(request):
     return render(request, 'portfolio/portfolio.html')
@@ -160,7 +180,10 @@ def chart_view(request, search, window):
 
 def fetch_articles(stocks=None):
 
-    query = "t=financial results"
+    if DISABLE_ARTICLES:
+        return []
+
+    query = "t=earnings report"
     if stocks is not None:
         query = f"s={stocks.split("-")[0]}"
 
@@ -178,10 +201,15 @@ def fetch_articles(stocks=None):
         response_json = response.json()
 
         for i in response_json:
+            print(urlparse(i['link']).netloc)
             i['title_image'] = get_website_logo(i['link'])
-            print()
             if urlparse(i['link']).netloc == "finance.yahoo.com":
                 i['title_image'] = "https://upload.wikimedia.org/wikipedia/commons/8/8f/Yahoo%21_Finance_logo_2021.png"
+            elif urlparse(i['link']).netloc == "www.globenewswire.com":
+                i['title_image'] = "https://www.globenewswire.com/content/logo/color.svg"
+
+            if len(i['content']) > 50:
+                i['content'] = i['content'][:250] + "..."
 
         return response_json
     except requests.exceptions.RequestException as e:
