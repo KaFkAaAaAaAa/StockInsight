@@ -3,11 +3,18 @@ import requests
 import json
 from datetime import datetime, timedelta
 from django.contrib.auth.models import User
+from django import forms
 
+class AccountForm(forms.ModelForm):
+    profile_picture = forms.ImageField(required=False)
+
+    class Meta:
+        model = User
+        fields = ['username', 'profile_picture']
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
 
     def __str__(self):
         return self.user.username
@@ -20,7 +27,7 @@ class StockData(models.Model):
 
     @staticmethod
     def fetch_and_process_data(search, window):
-        SERP_API_KEY = '3e59356712e9917d51d96eb521ace6d4f60291e1fa0b28e1237feb4d7440613c'
+        SERP_API_KEY = '655a7379557f6d9fdc84eff40a28937746c663614f72bb95b867e0da8ea2d06d'
         response = requests.get(f'https://serpapi.com/search.json?engine=google_finance&q={search}&window={window}&api_key={SERP_API_KEY}')
         data = response.json()
         print(data)

@@ -10,4 +10,6 @@ urlpatterns = [
     path('dashboard/', views.dashboard_view, name='dashboard'),
     path('dashboard/<str:window>/', views.dashboard_view, name='dashboard_with_window'),
     path('currencies/currency/<str:search>/<str:window>/', views.currency_view, name='currency_view'),
+    path('account/', views.account_view, name='account'),
+    path('logout/', views.logout_view, name='logout'),
 ]  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
