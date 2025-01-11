@@ -1,18 +1,20 @@
 from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+
 from django.contrib import messages
 from .models import StockData
 from .forms import LoginForm
 from .forms import RegisterForm
 from .forms import AccountForm
 from django.http import JsonResponse
-
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 import json
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urlparse
+
+DISABLE_ARTICLES = True
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -178,7 +180,10 @@ def chart_view(request, search, window):
 
 def fetch_articles(stocks=None):
 
-    query = "t=financial results"
+    if DISABLE_ARTICLES:
+        return []
+
+    query = "t=earnings report"
     if stocks is not None:
         query = f"s={stocks.split("-")[0]}"
 
@@ -196,10 +201,15 @@ def fetch_articles(stocks=None):
         response_json = response.json()
 
         for i in response_json:
+            print(urlparse(i['link']).netloc)
             i['title_image'] = get_website_logo(i['link'])
-            print()
             if urlparse(i['link']).netloc == "finance.yahoo.com":
                 i['title_image'] = "https://upload.wikimedia.org/wikipedia/commons/8/8f/Yahoo%21_Finance_logo_2021.png"
+            elif urlparse(i['link']).netloc == "www.globenewswire.com":
+                i['title_image'] = "https://www.globenewswire.com/content/logo/color.svg"
+
+            if len(i['content']) > 50:
+                i['content'] = i['content'][:250] + "..."
 
         return response_json
     except requests.exceptions.RequestException as e:
