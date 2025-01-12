@@ -58,7 +58,7 @@ class LoginForm(AuthenticationForm):
 class RegisterForm(UserCreationForm):
     profile_picture = forms.ImageField(
         required=False,
-        widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control,'})
     )
 
     class Meta:
