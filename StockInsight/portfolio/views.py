@@ -30,9 +30,11 @@ def login_view(request):
         form = LoginForm()
     return render(request, 'portfolio/login.html', {'form': form})
 
+
 def logout_view(request):
     logout(request)
     return render(request, 'logout.html')
+
 
 def register_view(request):
     if request.method == 'POST':
@@ -49,6 +51,7 @@ def register_view(request):
         form = RegisterForm()
     return render(request, 'portfolio/register.html', {'form': form})
 
+
 @login_required
 def account_view(request):
     if request.method == 'POST':
@@ -60,6 +63,7 @@ def account_view(request):
     else:
         form = AccountForm(instance=request.user)
     return render(request, 'portfolio/account.html', {'form': form})
+
 
 def portfolio_view(request):
     return render(request, 'portfolio/portfolio.html')
@@ -173,13 +177,13 @@ def chart_view(request, search, window):
         'currency_symbol': currency_symbol
     })
 
+
 # --------------------------------------------
 # --------------- FUNCTIONS ------------------
 # --------------------------------------------
 
 
 def fetch_articles(stocks=None):
-
     if DISABLE_ARTICLES:
         return []
 
