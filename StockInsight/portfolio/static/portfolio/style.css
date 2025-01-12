@@ -5,8 +5,7 @@
 
 body {
     /*background-image: url("../images/background_photo2.png");*/
-    background: linear-gradient(to top, #232526, #414345);
-    background-repeat: no-repeat;
+    background: linear-gradient(to top, #232526, #414345) no-repeat;
     display: flex;
     justify-content: center;
     align-items: center;
