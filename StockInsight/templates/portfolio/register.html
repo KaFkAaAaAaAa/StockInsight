@@ -12,9 +12,10 @@
 <body>
 <section class="container login_panel">
     <div class="row">
-         <div class="col-6 short_about">
+        <div class="col-6 short_about">
             <div class="text-center">
-                <img src="{% static 'images/StockInsightLogoWhiteBlue.png' %}" alt="Logo" class="img-fluid p-4 logo_login">
+                <img src="{% static 'images/StockInsightLogoWhiteBlue.png' %}" alt="Logo"
+                     class="img-fluid p-4 logo_login">
             </div>
             <div class="row mt-4">
                 <div class="col-3 text-end">
@@ -53,24 +54,61 @@
             <h1>Register</h1>
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                {{ form.as_p }}
-                {% if form.errors %}
-                    <div class="alert alert-danger">
-                        <ul>
-                            {% for field in form %}
-                                {% for error in field.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            {% endfor %}
-                            {% for error in form.non_field_errors %}
+                {{ form.non_field_errors }}
+
+                <div class="my-3">
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.username.errors %}
                                 <li>{{ error }}</li>
                             {% endfor %}
                         </ul>
-                    </div>
-                {% endif %}
-                <a href="{% url 'login' %}" class="btn btn-secondary" role="button">Back</a>
-                <button type="submit" class="btn btn-primary btn-lg">Register</button>
+                    {% endif %}
+                </div>
+
+                <div class="my-3">
+                    {{ form.password1 }}
+                    {% if form.password1.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.password1.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <div class="my-3">
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.password2.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <div class="my-3">
+                    <label for="id_profile_picture">Profile Picture:</label>
+                    {{ form.profile_picture }}
+                    {% if form.profile_picture.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.profile_picture.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <a href="{% url 'login' %}" class="btn btn-secondary btn-lg mb-3" role="button"
+                   style="color: #FFFFFF; font-weight: normal">Back</a>
+                <button type="submit" class="btn btn-success btn-lg mb-3"
+                        style="background-color: #2DB363; font-weight: normal">Register
+                </button>
             </form>
+
+
         </div>
     </div>
 </section>
