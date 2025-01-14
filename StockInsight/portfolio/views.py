@@ -1,17 +1,17 @@
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
 
+from django.contrib import messages
 from .models import StockData
-from .forms import RegisterForm
 from .forms import LoginForm
-
-from urllib.parse import urljoin
+from .forms import RegisterForm
+from .forms import AccountForm
+from django.http import JsonResponse
+from urllib.parse import urljoin, urlparse
 import json
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urlparse
 
 DISABLE_ARTICLES = True
 
@@ -30,6 +30,12 @@ def login_view(request):
         form = LoginForm()
     return render(request, 'portfolio/login.html', {'form': form})
 
+
+def logout_view(request):
+    logout(request)
+    return render(request, 'logout.html')
+
+
 def register_view(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST, request.FILES)
@@ -44,6 +50,19 @@ def register_view(request):
     else:
         form = RegisterForm()
     return render(request, 'portfolio/register.html', {'form': form})
+
+
+@login_required
+def account_view(request):
+    if request.method == 'POST':
+        form = AccountForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your profile has been updated successfully.')
+            return redirect('account')
+    else:
+        form = AccountForm(instance=request.user)
+    return render(request, 'portfolio/account.html', {'form': form})
 
 
 def portfolio_view(request):
@@ -158,13 +177,13 @@ def chart_view(request, search, window):
         'currency_symbol': currency_symbol
     })
 
+
 # --------------------------------------------
 # --------------- FUNCTIONS ------------------
 # --------------------------------------------
 
 
 def fetch_articles(stocks=None):
-
     if DISABLE_ARTICLES:
         return []
 

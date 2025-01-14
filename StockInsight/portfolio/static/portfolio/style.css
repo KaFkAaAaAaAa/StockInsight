@@ -4,12 +4,12 @@
 }
 
 body {
-    background-size: auto;
-    background: url("../images/background_photo.jpg") no-repeat top center;
+    /*background-image: url("../images/background_photo2.png");*/
+    background: linear-gradient(to top, #232526, #414345) no-repeat;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 90vh;
+    height: 100vh;
 }
 
 .short_about{
@@ -22,6 +22,11 @@ body {
     font-size: 28px;
 }
 
+.logo_login{
+    width: 70%;
+    height: auto;
+}
+
 .check_icon{
     width: 46px;
     height: auto;
@@ -30,4 +35,60 @@ body {
 .short_login{
     background-color: #FFFFFF;
     border-radius: 0 40px 40px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.short_login h1{
+    color: #173753;
+    font-weight: 700;
+    font-size: 55px;
+}
+
+.short_login a{
+    text-decoration: none;
+    color: #2DB363;
+    font-weight: 700;
+}
+
+/*  -------------
+    REGISTER.HTML
+    -------------
+*/
+
+.clear_form label{
+    color: #173753;
+    font-weight: 650;
+    font-size: 1rem;
+}
+
+/* Buttons */
+.nav-link.btn {
+    color: white !important;
+    margin-left: 10px;
+}
+
+.nav-link.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.nav-link.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+.nav-link.btn-logout {
+    background-color: rgba(124, 124, 124, 0.6);
+    border-color: rgba(124, 124, 124, 0.6);
+    border-radius: 50px;
+    padding: 5px 30px;
+}
+
+.nav-link.account-button {
+    padding: 5px 100px;
+    border-radius: 15px;
+    background-color: rgba(168, 168, 168, 0.6);
+    color: white !important;
 }
