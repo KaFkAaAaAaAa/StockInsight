@@ -1,7 +1,11 @@
 from django import forms
 from django.contrib.auth.models import User
+<<<<<<< master
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
+=======
+
+>>>>>>> wojtek
 
 class AccountForm(forms.ModelForm):
     profile_picture = forms.ImageField(
@@ -28,10 +32,12 @@ class AccountForm(forms.ModelForm):
         user = super(AccountForm, self).save(commit=False)
         if commit:
             user.save()
-            if 'profile_picture' in self.cleaned_data:
-                profile = user.profile
+            profile = user.profile
+            if 'profile_picture' in self.cleaned_data and self.cleaned_data['profile_picture']:
                 profile.profile_picture = self.cleaned_data['profile_picture']
-                profile.save()
+            else:
+                profile.profile_picture = 'profile_pictures/default_user_picture.png'
+            profile.save()
         return user
 
 
