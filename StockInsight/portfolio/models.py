@@ -79,3 +79,13 @@ class Currency(models.Model):
     value = models.FloatField()
 
     objects = models.Manager()
+
+
+class Transaction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    company = models.CharField(max_length=100)
+    quantity = models.PositiveIntegerField()
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} bought {self.quantity} shares of {self.company}"

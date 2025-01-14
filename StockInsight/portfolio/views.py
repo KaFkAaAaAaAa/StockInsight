@@ -1,12 +1,11 @@
 from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-
+from django.urls import reverse
 from django.contrib import messages
-from .models import StockData
-from .forms import LoginForm
-from .forms import RegisterForm
-from .forms import AccountForm
+from .models import StockData, Transaction
+from .forms import LoginForm, RegisterForm, AccountForm
+
 from django.http import JsonResponse
 from urllib.parse import urljoin, urlparse
 import json
@@ -33,7 +32,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return render(request, 'logout.html')
+    return render(request, 'portfolio/logout.html')
 
 
 def register_view(request):
@@ -53,21 +52,36 @@ def register_view(request):
 
 
 @login_required
-def account_view(request):
+def account_edit_view(request):
     if request.method == 'POST':
         form = AccountForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, 'Your profile has been updated successfully.')
-            return redirect('account')
+            return redirect('account_edit')
     else:
         form = AccountForm(instance=request.user)
-    return render(request, 'portfolio/account.html', {'form': form})
+    return render(request, 'portfolio/account_edit.html', {'form': form})
+
+@login_required
+def account_history_view(request):
+    transactions = Transaction.objects.filter(user=request.user)
+    return render(request, 'portfolio/account_history.html', {'transactions': transactions})
 
 
 def portfolio_view(request):
     return render(request, 'portfolio/portfolio.html')
 
+
+
+@login_required
+def market_view(request):
+    if request.method == 'POST':
+        company = request.POST['company']
+        quantity = int(request.POST['quantity'])
+        Transaction.objects.create(user=request.user, company=company, quantity=quantity)
+        messages.success(request, f'You have successfully bought {quantity} shares of {company}. <a href="{reverse("account_history")}">View History</a>')
+    return render(request, 'market.html')
 
 @login_required
 def dashboard_view(request, window="1d"):
