@@ -53,6 +53,17 @@ body {
     font-weight: 700;
 }
 
+/*  -------------
+    REGISTER.HTML
+    -------------
+*/
+
+.clear_form label{
+    color: #173753;
+    font-weight: 650;
+    font-size: 1rem;
+}
+
 /* Buttons */
 .nav-link.btn {
     color: white !important;
