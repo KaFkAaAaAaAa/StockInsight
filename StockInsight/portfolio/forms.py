@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-
+from .models import Post, Comment
 
 class AccountForm(forms.ModelForm):
     profile_picture = forms.ImageField(
@@ -82,3 +82,17 @@ class RegisterForm(UserCreationForm):
             'placeholder': 'Confirm Password',
             'id': 'password2'
         })
+
+
+# FORUM MODULE
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['title', 'content']
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']

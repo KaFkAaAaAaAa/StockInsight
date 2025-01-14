@@ -12,4 +12,9 @@ urlpatterns = [
     path('currencies/currency/<str:search>/<str:window>/', views.currency_view, name='currency_view'),
     path('account/', views.account_view, name='account'),
     path('logout/', views.logout_view, name='logout'),
+    # FORUM MODULE
+    path('forum/', views.post_list, name='post_list'),
+    path('forum/post/<int:pk>/', views.post_detail, name='post_detail'),
+    path('forum/post/new/', views.post_new, name='post_new'),
+    # -------------
 ]  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
