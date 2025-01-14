@@ -14,7 +14,8 @@
     <div class="row">
         <div class="col-6 short_about">
             <div class="text-center">
-                <img src="{% static 'images/StockInsightLogoWhiteBlue.png' %}" alt="Logo" class="img-fluid p-4 logo_login">
+                <img src="{% static 'images/StockInsightLogoWhiteBlue.png' %}" alt="Logo"
+                     class="img-fluid p-4 logo_login">
             </div>
             <div class="row mt-4">
                 <div class="col-3 text-end">
@@ -65,7 +66,7 @@
                     </div>
                 {% endfor %}
                 {% if form.non_field_errors %}
-                    <div class="alert alert-danger mt-3">
+                    <div class="alert alert-danger mt-2">
                         {{ form.non_field_errors|join:", " }}
                     </div>
                 {% endif %}
