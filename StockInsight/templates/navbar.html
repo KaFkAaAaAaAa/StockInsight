@@ -21,12 +21,12 @@
             </ul>
             <ul class="navbar-nav ms-auto">
                 {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link account-button" href="{% url 'account' %}">
-                        <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle" width="30" height="30">
-                        {{ user.username }}
-                    </a>
-                </li>
+{#                <li class="nav-item">#}
+{#                    <a class="nav-link account-button" href="{% url 'account' %}">#}
+{#                        <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle" width="30" height="30">#}
+{#                        {{ user.username }}#}
+{#                    </a>#}
+{#                </li>#}
                 <li class="nav-item">
                     <a class="nav-link btn btn-secondary btn-logout" href="{% url 'logout' %}">Logout</a>
                 </li>
