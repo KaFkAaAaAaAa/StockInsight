@@ -1,4 +1,5 @@
 from django.contrib.auth import login, authenticate, logout
+from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
@@ -12,6 +13,7 @@ from urllib.parse import urljoin, urlparse
 import json
 import requests
 from bs4 import BeautifulSoup
+import ast
 
 DISABLE_ARTICLES = True
 
@@ -64,7 +66,6 @@ def account_edit_view(request):
         form = AccountForm(instance=request.user)
     return render(request, 'portfolio/account_edit.html', {'form': form})
 
-
 @login_required
 def account_history_view(request):
     transactions = Transaction.objects.filter(user=request.user)
@@ -75,16 +76,44 @@ def portfolio_view(request):
     return render(request, 'portfolio/portfolio.html')
 
 
-@login_required
-def market_view(request):
-    if request.method == 'POST':
-        company = request.POST['company']
-        quantity = int(request.POST['quantity'])
-        Transaction.objects.create(user=request.user, company=company, quantity=quantity)
-        messages.success(request,
-                         f'You have successfully bought {quantity} shares of {company}. <a href="{reverse("account_history")}">View History</a>')
-    return render(request, 'market.html')
 
+@login_required
+def market_view(request, selected_stock="NVDA", window="1d"):
+    search = selected_stock
+    if "%3ANASDAQ" not in search or ":NASDAQ" not in search:
+        search += "%3ANASDAQ"
+    available_stocks = StockData.get_available_stocks()
+    available_windows = StockData.get_available_windows()
+    stock_data = StockData.fetch_and_process_data(search, window)
+
+    if request.method == 'POST':
+        try:
+            quantity = int(request.POST['quantity'])
+            Transaction.objects.create(user=request.user, company=selected_stock, quantity=quantity)
+            messages.success(request, f'You have successfully bought {quantity} shares of {selected_stock}. <a href="{reverse("account_history")}">View History</a>')
+        except (ValueError, KeyError):
+            messages.error(request, 'Invalid quantity. Please enter a valid number.')
+
+    # POSTS
+    posts = Post.objects.filter(related_tickers__contains=selected_stock).order_by('-created_at')
+    for post in posts:
+        post.related_tickers = ast.literal_eval(post.related_tickers)
+
+    # ----
+
+    context = {
+        'search': search,
+        'available_stocks': available_stocks,
+        'available_windows': available_windows,
+        'selected_stock': selected_stock,
+        'selected_window': window,
+        'stock_data': stock_data,
+        # ARTICLES
+        'articles': fetch_articles(selected_stock),
+        # POSTS
+        'posts': posts,
+    }
+    return render(request, 'market.html', context)
 
 @login_required
 def dashboard_view(request, window="1d"):
@@ -94,6 +123,14 @@ def dashboard_view(request, window="1d"):
     available_windows = StockData.get_available_windows()
     available_currencies = StockData.get_currencies()
     currencies = search.split('-')
+
+    # POSTS
+    posts = Post.objects.all().order_by('-created_at')
+    for post in posts:
+        post.related_tickers = ast.literal_eval(post.related_tickers)
+
+    # ----
+
     context = {
         'search': search,
         'window': window,
@@ -105,6 +142,8 @@ def dashboard_view(request, window="1d"):
         'to_currency': currencies[1],
         # ARTICLES
         'articles': fetch_articles(),
+        # POSTS
+        'posts': posts,
     }
     return render(request, 'dashboard.html', context)
 
@@ -116,6 +155,15 @@ def currency_view(request, search, window="1d"):
     available_windows = StockData.get_available_windows()
     available_currencies = StockData.get_currencies()
     currencies = search.split('-')
+
+    # POSTS
+    posts = Post.objects.filter(Q(related_tickers__contains=currencies[0]) |
+                                Q(related_tickers__contains=currencies[1])).order_by('-created_at')
+    for post in posts:
+        post.related_tickers = ast.literal_eval(post.related_tickers)
+
+    # ----
+
     context = {
         'search': search,
         'window': window,
@@ -127,6 +175,8 @@ def currency_view(request, search, window="1d"):
         'to_currency': currencies[1],
         # ARTICLES
         'articles': fetch_articles(search),
+        # POSTS
+        'posts': posts,
     }
     return render(request, 'currencies/currency.html', context)
 
