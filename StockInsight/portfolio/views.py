@@ -63,6 +63,7 @@ def account_edit_view(request):
         form = AccountForm(instance=request.user)
     return render(request, 'portfolio/account_edit.html', {'form': form})
 
+
 @login_required
 def account_history_view(request):
     transactions = Transaction.objects.filter(user=request.user)
@@ -73,15 +74,16 @@ def portfolio_view(request):
     return render(request, 'portfolio/portfolio.html')
 
 
-
 @login_required
 def market_view(request):
     if request.method == 'POST':
         company = request.POST['company']
         quantity = int(request.POST['quantity'])
         Transaction.objects.create(user=request.user, company=company, quantity=quantity)
-        messages.success(request, f'You have successfully bought {quantity} shares of {company}. <a href="{reverse("account_history")}">View History</a>')
+        messages.success(request,
+                         f'You have successfully bought {quantity} shares of {company}. <a href="{reverse("account_history")}">View History</a>')
     return render(request, 'market.html')
+
 
 @login_required
 def dashboard_view(request, window="1d"):

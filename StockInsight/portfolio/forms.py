@@ -1,11 +1,8 @@
 from django import forms
 from django.contrib.auth.models import User
-<<<<<<< master
+
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
-=======
-
->>>>>>> wojtek
 
 class AccountForm(forms.ModelForm):
     profile_picture = forms.ImageField(
