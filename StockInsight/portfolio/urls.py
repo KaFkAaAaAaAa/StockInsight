@@ -10,10 +10,12 @@ urlpatterns = [
     path('account/edit/', views.account_edit_view, name='account_edit'),
     path('account/history/', views.account_history_view, name='account_history'),
     path('portfolio/', views.portfolio_view, name='portfolio'),
+    path('market/<str:selected_stock>/<str:window>/', views.market_view, name='market_view'),
+    path('market/', views.market_view, name='market_view'),
     path('dashboard/', views.dashboard_view, name='dashboard'),
     path('dashboard/<str:window>/', views.dashboard_view, name='dashboard_with_window'),
     path('currencies/currency/<str:search>/<str:window>/', views.currency_view, name='currency_view'),
-    
+
     # jak nie działa to odkomencić
     # path('account/', views.account_view, name='account'),
 
@@ -24,4 +26,3 @@ urlpatterns = [
     # -------------
     path('market/', views.market_view, name='market'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
