@@ -3,224 +3,240 @@
 <div id="chart">
     <canvas id="stock-chart"></canvas>
 </div>
+<div class="d-flex flex-column align-items-center justify-content-center mt-2">
+    <div id="window-buttons" class="d-flex flex-wrap gap-2 mb-3 justify-content-center">
+        {% for window in available_windows %}
+            <button class="btn btn-secondary" onclick="changeWindow('{{ window }}')">
+                {{ window }}
+            </button>
+        {% endfor %}
+    </div>
 
-<!-- Buttons to change window -->
-<div id="window-buttons">
-    {% for window in available_windows %}
-        <button onclick="changeWindow('{{ window }}')">{{ window }}</button>
-    {% endfor %}
+    <div id="currency-selectors" class="d-flex align-items-center gap-3 justify-content-center">
+        <div class="form-group">
+            <label for="from-currency" class="form-label">From:</label>
+            <select id="from-currency" class="form-select" onchange="changeCurrency()">
+                {% for currency in available_currencies %}
+                    <option value="{{ currency }}" {% if currency == from_currency %} selected="selected"{% endif %}>
+                        {{ currency }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button class="btn btn-outline-success" onclick="switchCurrency()">Switch</button>
+
+        <div class="form-group">
+            <label for="to-currency" class="form-label">To:</label>
+            <select id="to-currency" class="form-select" onchange="changeCurrency()">
+                {% for currency in available_currencies %}
+                    <option value="{{ currency }}" {% if currency == to_currency %} selected="selected"{% endif %}>
+                        {{ currency }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
 </div>
 
-<!-- Select boxes to change currencies and switch button -->
-<div id="currency-selectors">
-    <select id="from-currency" onchange="changeCurrency()">
-        {% for currency in available_currencies %}
-            <option value="{{ currency }}" {% if currency == from_currency %} selected="selected"{% endif %}>{{ currency }}</option>
-        {% endfor %}
-    </select>
-    <button onclick="switchCurrency()">Switch Currency</button>
-    <select id="to-currency" onchange="changeCurrency()">
-        {% for currency in available_currencies %}
-            <option value="{{ currency }}" {% if currency == to_currency %} selected="selected"{% endif %}>{{ currency }}</option>
-        {% endfor %}
-    </select>
-</div>
+
+
 
 {% block javascript %}
-<script>
-    function changeWindow(timeWindow) {
-        const search = '{{ search }}';
-        let url;
-        // When on the dashboard page it redirects to the currency page
-        if (window.location.href.includes('dashboard')) {
-            url = `../currencies/currency/${search}/${timeWindow}/`;
-        } else {
-            url = `../../../currency/${search}/${timeWindow}/`;
-        }
-        window.location.href = url;
-    }
-
-    function changeCurrency() {
-        const fromCurrency = document.getElementById('from-currency').value;
-        const toCurrency = document.getElementById('to-currency').value;
-        const searchWindow = '{{ window }}';
-
-        if (fromCurrency === toCurrency) {
-            console.log("switch");
-            switchCurrency();
-        } else {
-            console.log("change");
+    <script>
+        function changeWindow(timeWindow) {
+            const search = '{{ search }}';
             let url;
+            // When on the dashboard page it redirects to the currency page
             if (window.location.href.includes('dashboard')) {
-                url = `../currencies/currency/${fromCurrency}-${toCurrency}/${searchWindow}/`;
+                url = `../currencies/currency/${search}/${timeWindow}/`;
             } else {
-                url = `../../../currency/${fromCurrency}-${toCurrency}/${searchWindow}/`;
+                url = `../../../currency/${search}/${timeWindow}/`;
             }
             window.location.href = url;
         }
-    }
 
-    function switchCurrency() {
-        const fromCurrency = '{{ from_currency|escapejs }}';
-        const toCurrency = '{{ to_currency|escapejs }}';
-        const searchWindow = '{{ window }}';
+        function changeCurrency() {
+            const fromCurrency = document.getElementById('from-currency').value;
+            const toCurrency = document.getElementById('to-currency').value;
+            const searchWindow = '{{ window }}';
 
-        document.getElementById('from-currency').value = toCurrency;
-        document.getElementById('to-currency').value = fromCurrency;
-
-        let url;
-        if (window.location.href.includes('dashboard')) {
-            url = `../currencies/currency/${toCurrency}-${fromCurrency}/${searchWindow}/`;
-        } else {
-            url = `../../../currency/${toCurrency}-${fromCurrency}/${searchWindow}/`;
+            if (fromCurrency === toCurrency) {
+                console.log("switch");
+                switchCurrency();
+            } else {
+                console.log("change");
+                let url;
+                if (window.location.href.includes('dashboard')) {
+                    url = `../currencies/currency/${fromCurrency}-${toCurrency}/${searchWindow}/`;
+                } else {
+                    url = `../../../currency/${fromCurrency}-${toCurrency}/${searchWindow}/`;
+                }
+                window.location.href = url;
+            }
         }
-        window.location.href = url;
-    }
 
-    // Chart.js
-    let stockData = {{ stock_data|safe }};
-    let stockDataJson;
-    try {
-        stockDataJson = JSON.parse('{{ stock_data_json|escapejs }}');
-        if (!Array.isArray(stockDataJson)) stockDataJson = [];
-    } catch (_) {
-        stockDataJson = [];
-    }
+        function switchCurrency() {
+            const fromCurrency = '{{ from_currency|escapejs }}';
+            const toCurrency = '{{ to_currency|escapejs }}';
+            const searchWindow = '{{ window }}';
 
-    const search = '{{ search }}';
-    const currencies = search.split('-');
+            document.getElementById('from-currency').value = toCurrency;
+            document.getElementById('to-currency').value = fromCurrency;
 
-    const currencySymbols = {
-        "USD": "$",
-        "EUR": "€",
-        "GBP": "£",
-        "JPY": "¥",
-        "AUD": "A$",
-        "CAD": "C$",
-        "CHF": "CHF",
-        "CNY": "¥",
-        "NZD": "NZ$",
-        "BTC": "₿",
-        "ETH": "Ξ",
-        "XRP": "XRP",
-        "BCH": "BCH",
-        "ADA": "₳",
-        "DOT": "DOT",
-        "BNB": "BNB",
-        "USDT": "₮"
-    };
-
-    const currencyNames = {
-        "USD": "US Dollar",
-        "EUR": "Euro",
-        "GBP": "British Pound",
-        "JPY": "Japanese Yen",
-        "AUD": "Australian Dollar",
-        "CAD": "Canadian Dollar",
-        "CHF": "Swiss Franc",
-        "CNY": "Chinese Yuan",
-        "NZD": "New Zealand Dollar",
-        "BTC": "Bitcoin",
-        "ETH": "Ethereum",
-        "LTC": "Litecoin",
-        "XRP": "Ripple",
-        "BCH": "Bitcoin Cash",
-        "ADA": "Cardano",
-        "DOT": "Polkadot",
-        "BNB": "Binance Coin",
-        "USDT": "Tether"
-    };
-
-    const fromCurrency = currencyNames[currencies[0]] || currencies[0];
-    const toCurrency = currencyNames[currencies[1]] || currencies[1];
-    const chartLabel = `${fromCurrency} to ${toCurrency}`;
-    const currencySymbol = currencySymbols[currencies[1]] || '';
-
-    let borderColor;
-    if (stockData.length > 1) {
-        const firstValue = stockData[0].price;
-        const lastValue = stockData[stockData.length - 1].price;
-        if (lastValue > firstValue) {
-            borderColor = 'rgb(96,243,96)'; // Green
-        } else if (lastValue < firstValue) {
-            borderColor = 'rgb(255,63,63)'; // Red
-        } else {
-            borderColor = 'rgb(99,99,255)'; // Blue
+            let url;
+            if (window.location.href.includes('dashboard')) {
+                url = `../currencies/currency/${toCurrency}-${fromCurrency}/${searchWindow}/`;
+            } else {
+                url = `../../../currency/${toCurrency}-${fromCurrency}/${searchWindow}/`;
+            }
+            window.location.href = url;
         }
-    } else {
-        borderColor = 'rgba(99,99,255,1)'; // Default to Blue if not enough data
-    }
 
-    const timeUnit = {
-        '1d': 'hour',
-        '5d': 'day',
-        '1m': 'day',
-        '6m': 'week',
-        '1y': 'month',
-        '5y': 'year'
-    }['{{ window }}'] || 'hour';
+        // Chart.js
+        let stockData = {{ stock_data|safe }};
+        let stockDataJson;
+        try {
+            stockDataJson = JSON.parse('{{ stock_data_json|escapejs }}');
+            if (!Array.isArray(stockDataJson)) stockDataJson = [];
+        } catch (_) {
+            stockDataJson = [];
+        }
 
-    const stepSize = {
-        '1d': 1,
-        '5d': 1,
-        '1m': 1,
-        '6m': 1,
-        '1y': 1,
-        '5y': 1
-    }['{{ window }}'] || 1;
+        const search = '{{ search }}';
+        const currencies = search.split('-');
 
-    const ctx = document.getElementById('stock-chart').getContext('2d');
-    const stockChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: stockData.map(data => new Date(data.timestamp)),
-            datasets: [{
-                label: chartLabel,
-                data: stockData.map(data => data.price),
-                borderColor: borderColor,
-                borderWidth: 3
-            }]
-        },
-        options: {
-            scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        unit: timeUnit,
-                        stepSize: stepSize,
-                        tooltipFormat: 'MMM dd, yyyy HH:mm'
+        const currencySymbols = {
+            "USD": "$",
+            "EUR": "€",
+            "GBP": "£",
+            "JPY": "¥",
+            "AUD": "A$",
+            "CAD": "C$",
+            "CHF": "CHF",
+            "CNY": "¥",
+            "NZD": "NZ$",
+            "BTC": "₿",
+            "ETH": "Ξ",
+            "XRP": "XRP",
+            "BCH": "BCH",
+            "ADA": "₳",
+            "DOT": "DOT",
+            "BNB": "BNB",
+            "USDT": "₮"
+        };
+
+        const currencyNames = {
+            "USD": "US Dollar",
+            "EUR": "Euro",
+            "GBP": "British Pound",
+            "JPY": "Japanese Yen",
+            "AUD": "Australian Dollar",
+            "CAD": "Canadian Dollar",
+            "CHF": "Swiss Franc",
+            "CNY": "Chinese Yuan",
+            "NZD": "New Zealand Dollar",
+            "BTC": "Bitcoin",
+            "ETH": "Ethereum",
+            "LTC": "Litecoin",
+            "XRP": "Ripple",
+            "BCH": "Bitcoin Cash",
+            "ADA": "Cardano",
+            "DOT": "Polkadot",
+            "BNB": "Binance Coin",
+            "USDT": "Tether"
+        };
+
+        const fromCurrency = currencyNames[currencies[0]] || currencies[0];
+        const toCurrency = currencyNames[currencies[1]] || currencies[1];
+        const chartLabel = `${fromCurrency} to ${toCurrency}`;
+        const currencySymbol = currencySymbols[currencies[1]] || '';
+
+        let borderColor;
+        if (stockData.length > 1) {
+            const firstValue = stockData[0].price;
+            const lastValue = stockData[stockData.length - 1].price;
+            if (lastValue > firstValue) {
+                borderColor = 'rgb(96,243,96)'; // Green
+            } else if (lastValue < firstValue) {
+                borderColor = 'rgb(255,63,63)'; // Red
+            } else {
+                borderColor = 'rgb(99,99,255)'; // Blue
+            }
+        } else {
+            borderColor = 'rgba(99,99,255,1)'; // Default to Blue if not enough data
+        }
+
+        const timeUnit = {
+            '1d': 'hour',
+            '5d': 'day',
+            '1m': 'day',
+            '6m': 'week',
+            '1y': 'month',
+            '5y': 'year'
+        }['{{ window }}'] || 'hour';
+
+        const stepSize = {
+            '1d': 1,
+            '5d': 1,
+            '1m': 1,
+            '6m': 1,
+            '1y': 1,
+            '5y': 1
+        }['{{ window }}'] || 1;
+
+        const ctx = document.getElementById('stock-chart').getContext('2d');
+        const stockChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: stockData.map(data => new Date(data.timestamp)),
+                datasets: [{
+                    label: chartLabel,
+                    data: stockData.map(data => data.price),
+                    borderColor: borderColor,
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: timeUnit,
+                            stepSize: stepSize,
+                            tooltipFormat: 'MMM dd, yyyy HH:mm'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        }
                     },
-                    title: {
-                        display: true,
-                        text: 'Time'
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Price'
-                    },
-                    ticks: {
-                        callback: function(value) {
-                            return currencySymbol + value.toFixed(2);
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Price'
+                        },
+                        ticks: {
+                            callback: function (value) {
+                                return currencySymbol + value.toFixed(2);
+                            }
                         }
                     }
-                }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const label = context.dataset.label || '';
-                            const value = context.raw.toFixed(2);
-                            const time = new Date(context.label).toLocaleString();
-                            return `${label}: ${currencySymbol}${value} (${time})`;
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const label = context.dataset.label || '';
+                                const value = context.raw.toFixed(2);
+                                const time = new Date(context.label).toLocaleString();
+                                return `${label}: ${currencySymbol}${value} (${time})`;
+                            }
                         }
                     }
                 }
             }
-        }
-    });
-</script>
+        });
+    </script>
 {% endblock %}
 
