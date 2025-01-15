@@ -31,8 +31,7 @@ class StockData(models.Model):
     @staticmethod
     def fetch_and_process_data(search, window):
         SERP_API_KEY = '655a7379557f6d9fdc84eff40a28937746c663614f72bb95b867e0da8ea2d06d'
-        response = requests.get(
-            f'https://serpapi.com/search.json?engine=google_finance&q={search}&window={window}&api_key={SERP_API_KEY}')
+        response = requests.get(f'https://serpapi.com/search.json?engine=google_finance&q={search}&window={window}&api_key={SERP_API_KEY}')
         data = response.json()
         print(data)
 
@@ -51,14 +50,15 @@ class StockData(models.Model):
         }.get(window, timedelta(minutes=10))  # Default to 10 minutes if window is unknown
 
         for item in stock_data:
-            timestamp = datetime.strptime(item['date'], '%b %d %Y, %I:%M %p %Z')
+            date_str = item['date'].replace('-05:00', '')
+            timestamp = datetime.strptime(date_str, '%b %d %Y, %I:%M %p %Z')
             rounded_timestamp = timestamp.replace(minute=0, second=0, microsecond=0)
             if timestamp.minute >= 30:
                 rounded_timestamp += timedelta(hours=1)
             if last_timestamp is None or rounded_timestamp >= last_timestamp + time_delta:
                 filtered_stock_data.append({'timestamp': rounded_timestamp.isoformat(), 'price': item['price']})
                 last_timestamp = rounded_timestamp
-
+        print(json.dumps(filtered_stock_data))
         return json.dumps(filtered_stock_data)
 
     @staticmethod
@@ -67,9 +67,11 @@ class StockData(models.Model):
 
     @staticmethod
     def get_currencies():
-        return ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "CNY", "NZD", "BTC", "ETH", "XRP", "BCH", "ADA", "DOT",
-                "BNB", "USDT"]
+        return ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "CNY", "NZD", "BTC", "ETH", "XRP", "BCH", "ADA", "DOT", "BNB", "USDT"]
 
+    @staticmethod
+    def get_available_stocks():
+        return ['AAPL', 'GOOGL', 'AMZN', 'MSFT', 'TSLA', 'FB', 'NVDA', 'PYPL', 'ADBE', 'INTC']
 
 class Article(models.Model):
     title = models.CharField(max_length=255)
