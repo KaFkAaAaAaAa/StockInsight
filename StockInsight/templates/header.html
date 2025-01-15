@@ -10,16 +10,42 @@
 </style>
 <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
-        <a class="navbar-brand" href="dashboard.html">
+        <a class="navbar-brand m-2" href="{% url 'dashboard' %}">
             <img src="{% static 'images/StockInsightLogoWhiteBlue.png' %}" alt="Logo"
                  style="width: 300px; height: auto">
         </a>
         <div class="navbar navbar-collapse">
-            <div class="navbar-nav">
-                <a class="nav-link active" href="dashboard.html">Dashboard</a>
-                <a class="nav-link" href="portfolio/portfolio.html">Portfolio</a>
-                <a class="nav-link disabled">Market</a>
-            </div>
+            <ul class="navbar-nav mx-auto mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{% url 'dashboard' %}">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'portfolio' %}">Portfolio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled">Market</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+{#                <li class="nav-item">#}
+{#                    <a class="nav-link account-button" href="{% url 'account' %}">#}
+{#                        <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle" width="30" height="30">#}
+{#                        {{ user.username }}#}
+{#                    </a>#}
+{#                </li>#}
+                <li class="nav-item me-2">
+                    <a class="btn btn-secondary btn-logout" href="{% url 'logout' %}">Logout</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link btn btn-primary" href="{% url 'login' %}">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-secondary" href="{% url 'register' %}">Register</a>
+                </li>
+                {% endif %}
+            </ul>
         </div>
     </div>
 </nav>

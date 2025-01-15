@@ -21,14 +21,16 @@
             </ul>
             <ul class="navbar-nav ms-auto">
                 {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link account-button" href="{% url 'account' %}">
-                        <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle" width="30" height="30">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle account-button" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="{{ user.profile.profile_picture.url|default:'{% static "images/default_user_picture.png" %}' }}" alt="Profile Picture" class="rounded-circle" width="30" height="30">
                         {{ user.username }}
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link btn btn-secondary btn-logout" href="{% url 'logout' %}">Logout</a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="{% url 'account_edit' %}">Edit Profile</a></li>
+                        <li><a class="dropdown-item" href="{% url 'account_history' %}">History</a></li>
+                        <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                    </ul>
                 </li>
                 {% else %}
                 <li class="nav-item">
