@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import Post, Comment
+from .models import StockData
 
 class AccountForm(forms.ModelForm):
     profile_picture = forms.ImageField(
@@ -87,9 +88,18 @@ class RegisterForm(UserCreationForm):
 # FORUM MODULE
 
 class PostForm(forms.ModelForm):
+    currencies = StockData.get_currencies()
+    for i in range(len(currencies)):
+        currencies[i] = (currencies[i], currencies[i])
+    related_tickers = forms.MultipleChoiceField(
+        choices=currencies,
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
+        required=False
+    )
+
     class Meta:
         model = Post
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'related_tickers']
 
 
 class CommentForm(forms.ModelForm):
