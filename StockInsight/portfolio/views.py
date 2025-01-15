@@ -94,6 +94,13 @@ def market_view(request, selected_stock="NVDA", window="1d"):
         except (ValueError, KeyError):
             messages.error(request, 'Invalid quantity. Please enter a valid number.')
 
+    # POSTS
+    posts = Post.objects.filter(related_tickers__contains=selected_stock).order_by('-created_at')
+    for post in posts:
+        post.related_tickers = ast.literal_eval(post.related_tickers)
+
+    # ----
+
     context = {
         'search': search,
         'available_stocks': available_stocks,
@@ -101,6 +108,10 @@ def market_view(request, selected_stock="NVDA", window="1d"):
         'selected_stock': selected_stock,
         'selected_window': window,
         'stock_data': stock_data,
+        # ARTICLES
+        'articles': fetch_articles(selected_stock),
+        # POSTS
+        'posts': posts,
     }
     return render(request, 'market.html', context)
 

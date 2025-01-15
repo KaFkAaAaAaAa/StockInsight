@@ -92,7 +92,7 @@ class RegisterForm(UserCreationForm):
 # FORUM MODULE
 
 class PostForm(forms.ModelForm):
-    currencies = StockData.get_currencies()
+    currencies = StockData.get_currencies() + StockData.get_available_stocks()
     for i in range(len(currencies)):
         currencies[i] = (currencies[i], currencies[i])
     related_tickers = forms.MultipleChoiceField(
