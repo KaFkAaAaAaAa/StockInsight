@@ -1,4 +1,5 @@
 from django.contrib.auth import login, authenticate, logout
+from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
@@ -12,6 +13,7 @@ from urllib.parse import urljoin, urlparse
 import json
 import requests
 from bs4 import BeautifulSoup
+import ast
 
 DISABLE_ARTICLES = True
 
@@ -94,6 +96,14 @@ def dashboard_view(request, window="1d"):
     available_windows = StockData.get_available_windows()
     available_currencies = StockData.get_currencies()
     currencies = search.split('-')
+
+    # POSTS
+    posts = Post.objects.all().order_by('-created_at')
+    for post in posts:
+        post.related_tickers = ast.literal_eval(post.related_tickers)
+
+    # ----
+
     context = {
         'search': search,
         'window': window,
@@ -105,6 +115,8 @@ def dashboard_view(request, window="1d"):
         'to_currency': currencies[1],
         # ARTICLES
         'articles': fetch_articles(),
+        # POSTS
+        'posts': posts,
     }
     return render(request, 'dashboard.html', context)
 
@@ -116,6 +128,15 @@ def currency_view(request, search, window="1d"):
     available_windows = StockData.get_available_windows()
     available_currencies = StockData.get_currencies()
     currencies = search.split('-')
+
+    # POSTS
+    posts = Post.objects.filter(Q(related_tickers__contains=currencies[0]) |
+                                Q(related_tickers__contains=currencies[1])).order_by('-created_at')
+    for post in posts:
+        post.related_tickers = ast.literal_eval(post.related_tickers)
+
+    # ----
+
     context = {
         'search': search,
         'window': window,
@@ -127,6 +148,8 @@ def currency_view(request, search, window="1d"):
         'to_currency': currencies[1],
         # ARTICLES
         'articles': fetch_articles(search),
+        # POSTS
+        'posts': posts,
     }
     return render(request, 'currencies/currency.html', context)
 

@@ -85,7 +85,6 @@ class Currency(models.Model):
     objects = models.Manager()
 
 
-
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts', null=True, blank=True)
     title = models.CharField(max_length=255)
