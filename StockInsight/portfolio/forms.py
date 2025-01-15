@@ -1,9 +1,10 @@
 from django import forms
 from django.contrib.auth.models import User
+
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+
 from .models import Post, Comment
 from .models import StockData
-
 
 class AccountForm(forms.ModelForm):
     profile_picture = forms.ImageField(
