@@ -13,14 +13,18 @@
 {% include "header.html" %}
 <section class="container-fluid text-center dashboard_site">
     <div class="hero-section text-center">
-        <h1>Witaj, {{ user.first_name }}!</h1>
+        <h1>Hi, {{ user.first_name }}!</h1>
     </div>
     <div class="text-center dashboard_chart">
         {% include 'chart.html' %}
     </div>
     <hr>
-    <div class="row">
-        {% include 'articles.html' %}
+    <div class="container testimonial-group">
+        <div class="row">
+        <div class="col-xs-4">
+            {% include 'articles.html' %}
+        </div>
+    </div>
     </div>
 </section>
 </body>

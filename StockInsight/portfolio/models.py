@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 from django import forms
 
+
 class AccountForm(forms.ModelForm):
     profile_picture = forms.ImageField(required=False)
 
@@ -12,12 +13,14 @@ class AccountForm(forms.ModelForm):
         model = User
         fields = ['username', 'profile_picture']
 
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
 
     def __str__(self):
         return self.user.username
+
 
 class StockData(models.Model):
     timestamp = models.DateTimeField()
@@ -28,7 +31,8 @@ class StockData(models.Model):
     @staticmethod
     def fetch_and_process_data(search, window):
         SERP_API_KEY = '655a7379557f6d9fdc84eff40a28937746c663614f72bb95b867e0da8ea2d06d'
-        response = requests.get(f'https://serpapi.com/search.json?engine=google_finance&q={search}&window={window}&api_key={SERP_API_KEY}')
+        response = requests.get(
+            f'https://serpapi.com/search.json?engine=google_finance&q={search}&window={window}&api_key={SERP_API_KEY}')
         data = response.json()
         print(data)
 
@@ -81,6 +85,27 @@ class Currency(models.Model):
     objects = models.Manager()
 
 
+
+class Post(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts', null=True, blank=True)
+    title = models.CharField(max_length=255)
+    related_tickers = models.CharField(max_length=25)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments', null=True, blank=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Comment on {self.post.title}'
+
 class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     company = models.CharField(max_length=100)
@@ -89,3 +114,4 @@ class Transaction(models.Model):
 
     def __str__(self):
         return f"{self.user.username} bought {self.quantity} shares of {self.company}"
+

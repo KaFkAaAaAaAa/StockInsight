@@ -20,6 +20,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="bootstrap" level="application" />
     <orderEntry type="library" name="bootstrap-icons" level="application" />
+    <orderEntry type="library" name="chartjs-adapter-date-fns" level="application" />
+    <orderEntry type="library" name="chart.js" level="application" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Django" />
