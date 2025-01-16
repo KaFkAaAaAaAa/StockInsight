@@ -11,8 +11,8 @@
 <body>
 {% include "navbar.html" %}
 <section class="container-fluid text-center dashboard_site">
-    <div class="hero-section text-center">
-        <h1>Hi, {{ user.username }}!</h1>
+    <div class="hero-section text-center mt-2">
+        <h1>Hi, <strong>{{ user.username }}</strong>!</h1>
     </div>
     <div class="text-center dashboard_chart">
         {% include 'chart.html' %}
