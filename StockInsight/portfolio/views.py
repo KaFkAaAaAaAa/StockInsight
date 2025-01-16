@@ -323,7 +323,8 @@ def fetch_articles(stocks=None):
     time = time.replace(" ", "T")
     time = time.split(".")[0]
 
-    API_KEY = "V3CqrPpcGerzNYDWXVJBAN7yrdkTmcbXImHldrbJ"
+    API_KEY = "l6DYw4Xg0iTKM7vwAPytWb2F93ZJZhfYQzrVPiJo"
+
     api_url = (f"https://api.marketaux.com/v1/news/all"
                f"?countries=us"
                f"&filter_entities=true"
