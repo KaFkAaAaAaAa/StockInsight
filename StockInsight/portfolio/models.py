@@ -30,7 +30,7 @@ class StockData(models.Model):
 
     @staticmethod
     def fetch_and_process_data(search, window):
-        SERP_API_KEY = '655a7379557f6d9fdc84eff40a28937746c663614f72bb95b867e0da8ea2d06d'
+        SERP_API_KEY = '675093b1d4f189f365f7642d8c97aebbc69de8b3d21bac35f6dbab3d8d1be778'
         response = requests.get(f'https://serpapi.com/search.json?engine=google_finance&q={search}&window={window}&api_key={SERP_API_KEY}')
         data = response.json()
         print(data)

@@ -14,8 +14,9 @@ import json
 import requests
 from bs4 import BeautifulSoup
 import ast
+from datetime import datetime, timedelta
 
-DISABLE_ARTICLES = True
+DISABLE_ARTICLES = False
 
 
 def login_view(request):
@@ -174,7 +175,7 @@ def currency_view(request, search, window="1d"):
         'from_currency': currencies[0],
         'to_currency': currencies[1],
         # ARTICLES
-        'articles': fetch_articles(search),
+        # 'articles': fetch_articles(search),
         # POSTS
         'posts': posts,
     }
@@ -247,6 +248,7 @@ def chart_view(request, search, window):
 
 # FORUM MODULE
 
+@login_required
 def post_list(request):
     posts = Post.objects.all().order_by('-created_at')
 
@@ -269,6 +271,7 @@ def post_list(request):
     })
 
 
+@login_required
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
     post.related_tickers = ast.literal_eval(post.related_tickers)
@@ -289,6 +292,7 @@ def post_detail(request, pk):
                                                       'comments': comments})
 
 
+@login_required
 def post_new(request):
     if request.method == 'POST':
         form = PostForm(request.POST)
@@ -310,9 +314,51 @@ def fetch_articles(stocks=None):
     if DISABLE_ARTICLES:
         return []
 
+    query = ""
+    if stocks is not None:
+        query = f"{stocks.split('-')[0]}"
+
+    time = datetime.now() - timedelta(hours=24)
+    time = str(time)
+    time = time.replace(" ", "T")
+    time = time.split(".")[0]
+
+    API_KEY = "l6DYw4Xg0iTKM7vwAPytWb2F93ZJZhfYQzrVPiJo"
+
+    api_url = (f"https://api.marketaux.com/v1/news/all"
+               f"?countries=us"
+               f"&filter_entities=true"
+               f"&symbols={query}"
+               f"&limit=3"
+               f"&published_after={time}"
+               f"&api_token={API_KEY}")
+
+    response = requests.get(api_url)
+    response.raise_for_status()
+    response_json = response.json()
+
+    articles = response_json['data']
+
+    for article in articles:
+
+        past_date = datetime.strptime(article['published_at'].split('.')[0], '%Y-%m-%dT%H:%M:%S')
+        current_date = datetime.now()
+        time_difference = current_date - past_date
+        hours_passed = round(time_difference.total_seconds() / 3600)
+
+        article['hours_ago'] = hours_passed
+
+    print(api_url)
+    return articles
+
+
+def fetch_articles_deprecated(stocks=None):
+    if DISABLE_ARTICLES:
+        return []
+
     query = "t=earnings report"
     if stocks is not None:
-        query = f"s={stocks.split("-")[0]}"
+        query = f"s={stocks.split('-')[0]}"
 
     api_url = (f"https://eodhd.com/api/news"
                f"?{query}"
@@ -329,11 +375,13 @@ def fetch_articles(stocks=None):
 
         for i in response_json:
             print(urlparse(i['link']).netloc)
-            i['title_image'] = get_website_logo(i['link'])
-            if urlparse(i['link']).netloc == "finance.yahoo.com":
+
+            if "finance.yahoo.com" in urlparse(i['link']).netloc:
                 i['title_image'] = "https://upload.wikimedia.org/wikipedia/commons/8/8f/Yahoo%21_Finance_logo_2021.png"
             elif urlparse(i['link']).netloc == "www.globenewswire.com":
                 i['title_image'] = "https://www.globenewswire.com/content/logo/color.svg"
+            else:
+                i['title_image'] = get_website_logo(i['link'])
 
             if len(i['content']) > 50:
                 i['content'] = i['content'][:250] + "..."
