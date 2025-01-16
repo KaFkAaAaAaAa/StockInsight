@@ -316,7 +316,7 @@ def fetch_articles(stocks=None):
 
     query = ""
     if stocks is not None:
-        query = f"{stocks.split("-")[0]}"
+        query = f"{stocks.split('-')[0]}"
 
     time = datetime.now() - timedelta(hours=24)
     time = str(time)
@@ -357,7 +357,7 @@ def fetch_articles_deprecated(stocks=None):
 
     query = "t=earnings report"
     if stocks is not None:
-        query = f"s={stocks.split("-")[0]}"
+        query = f"s={stocks.split('-')[0]}"
 
     api_url = (f"https://eodhd.com/api/news"
                f"?{query}"
