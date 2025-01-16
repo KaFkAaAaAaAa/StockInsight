@@ -248,6 +248,7 @@ def chart_view(request, search, window):
 
 # FORUM MODULE
 
+@login_required
 def post_list(request):
     posts = Post.objects.all().order_by('-created_at')
 
@@ -270,6 +271,7 @@ def post_list(request):
     })
 
 
+@login_required
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
     post.related_tickers = ast.literal_eval(post.related_tickers)
@@ -290,6 +292,7 @@ def post_detail(request, pk):
                                                       'comments': comments})
 
 
+@login_required
 def post_new(request):
     if request.method == 'POST':
         form = PostForm(request.POST)
@@ -332,8 +335,20 @@ def fetch_articles(stocks=None):
     response = requests.get(api_url)
     response.raise_for_status()
     response_json = response.json()
+
+    articles = response_json['data']
+
+    for article in articles:
+
+        past_date = datetime.strptime(article['published_at'].split('.')[0], '%Y-%m-%dT%H:%M:%S')
+        current_date = datetime.now()
+        time_difference = current_date - past_date
+        hours_passed = round(time_difference.total_seconds() / 3600)
+
+        article['hours_ago'] = hours_passed
+
     print(api_url)
-    return response_json['data']
+    return articles
 
 
 def fetch_articles_deprecated(stocks=None):
