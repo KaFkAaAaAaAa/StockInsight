@@ -6,17 +6,27 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    {% include 'chart.html' %}
-    <hr>
+    {% include "navbar.html" %}
+    <div class="container mt-2">
+        <div class="hero-section text-center mt-2">
+            <h1>Currencies</h1>
+        </div>
+        <div class="text-center dashboard_chart">
+            {% include 'chart.html' %}
+        </div>
+        <hr>
 
-<!--    <div class="row">-->
-<!--        {% include 'articles.html' %}-->
-<!--    </div>-->
+    <!--    <div class="row">-->
+    <!--        {% include 'articles.html' %}-->
+    <!--    </div>-->
 
-<!--  POSTS  -->
-    <div class="row">
-        {% include "forum/posts.html" %}
+    <!--  POSTS  -->
+        <h1 class="text-center">Posts related to <strong>{{ from_currency }}</strong> and <strong>{{ to_currency }}</strong></h1>
+        <div class="row mt-4">
+            {% include "forum/posts.html" %}
+        </div>
+    <!--------------->
     </div>
-<!--------------->
+    {% include "footer.html" %}
 </body>
 </html>
