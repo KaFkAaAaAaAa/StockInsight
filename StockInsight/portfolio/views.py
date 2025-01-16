@@ -175,7 +175,7 @@ def currency_view(request, search, window="1d"):
         'from_currency': currencies[0],
         'to_currency': currencies[1],
         # ARTICLES
-        'articles': fetch_articles(search),
+        # 'articles': fetch_articles(search),
         # POSTS
         'posts': posts,
     }
@@ -325,7 +325,7 @@ def fetch_articles(stocks=None):
                f"?countries=us"
                f"&filter_entities=true"
                f"&symbols={query}"
-               f"&limit=5"
+               f"&limit=3"
                f"&published_after={time}"
                f"&api_token={API_KEY}")
 
