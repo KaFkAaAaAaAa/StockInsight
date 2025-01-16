@@ -8,8 +8,16 @@
 <div class="container mt-4">
         <h1>{{ post.title }}</h1>
         <a href="{% url 'post_list' %}" class="btn btn-secondary mb-3">Back to Forum</a>
-        <p class="text-muted">By <strong>{{ post.user }}</strong> on {{ post.created_at }}</p>
-        <p>{{ post.content }}</p>
+        <div class="row">
+            <div class="col-1">
+                <img src="{{ post.user.profile.profile_picture.url|default:'{% static "images/default_user_picture.png" %}' }}"
+                                 alt="Profile Picture" class="rounded-circle mx-2" width="90" height="90" style="border: 2px solid black;">
+            </div>
+            <div class="col">
+                <p class="text-muted">By <strong>{{ post.user }}</strong> on {{ post.created_at }}</p>
+                <p>{{ post.content }}</p>
+            </div>
+        </div>
         <small>
             Related tickers:
             {% for ticker in post.related_tickers %}
@@ -29,8 +37,16 @@
             {% for comment in comments %}
             <div class="card mb-2">
                 <div class="card-body">
-                    <p class="card-text">{{ comment.content }}</p>
-                    <small class="text-muted">By <strong>{{ comment.user }}</strong> on {{ comment.created_at }}</small>
+                    <div class="row">
+                        <div class="col-1">
+                            <img src="{{ comment.user.profile.profile_picture.url|default:'{% static "images/default_user_picture.png" %}' }}"
+                                             alt="Profile Picture" class="rounded-circle mx-2" width="90" height="90" style="border: 2px solid black;">
+                        </div>
+                        <div class="col">
+                            <p class="card-text">{{ comment.content }}</p>
+                            <small class="text-muted">By <strong>{{ comment.user }}</strong> on {{ comment.created_at }}</small>
+                        </div>
+                    </div>
                 </div>
             </div>
             {% empty %}
