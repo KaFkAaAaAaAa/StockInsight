@@ -9,3 +9,8 @@
     margin: 0 auto;
     text-align: center;
 }
+
+h1, h2{
+    color: #173753;
+    font-weight: 650;
+}

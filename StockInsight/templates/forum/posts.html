@@ -8,7 +8,7 @@
                 {% endfor %}
             </h6>
             <div class="card-body">
-                <a href="{% url 'post_detail' post.pk %}"><h5 class="card-title">{{ post.title }}</h5></a>
+                <a href="{% url 'post_detail' post.pk %}" style="text-decoration: none"><h5 class="card-title">{{ post.title }}</h5></a>
                 <p class="card-text">{{ post.content }}</p>
             </div>
             <div class="card-footer text-body-secondary">
