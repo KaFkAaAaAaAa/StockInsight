@@ -249,11 +249,30 @@ def chart_view(request, search, window):
 
 def post_list(request):
     posts = Post.objects.all().order_by('-created_at')
-    return render(request, 'forum/post_list.html', {'posts': posts})
+
+    ticker_filter = request.GET.get('ticker')
+    title_filter = request.GET.get('title')
+
+    if ticker_filter:
+        posts = posts.filter(related_tickers__contains=ticker_filter)
+
+    if title_filter:
+        posts = posts.filter(title__contains=title_filter)
+
+    for post in posts:
+        post.related_tickers = ast.literal_eval(post.related_tickers)
+
+    tickers = StockData.get_currencies() + StockData.get_available_stocks()
+    return render(request, 'forum/post_list.html', {
+        'posts': posts,
+        'tickers': tickers
+    })
 
 
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
+    post.related_tickers = ast.literal_eval(post.related_tickers)
+    comments = post.comments.all().order_by('-created_at')
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
@@ -264,7 +283,10 @@ def post_detail(request, pk):
             return redirect('post_detail', pk=post.pk)
     else:
         form = CommentForm()
-    return render(request, 'forum/post_detail.html', {'post': post, 'form': form})
+    return render(request, 'forum/post_detail.html', {
+                                                      'post': post,
+                                                      'form': form,
+                                                      'comments': comments})
 
 
 def post_new(request):

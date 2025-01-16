@@ -9,16 +9,45 @@
 </head>
 <body>
 {% include 'navbar.html' %}
-<h1>Forum</h1>
-    <a href="{% url 'post_new' %}">Create New Post</a>
-    <ul>
-        {% for post in posts %}
-            <li>
-                <a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a>
-                <p>Posted on {{ post.created_at }} by {{ post.user }}</p>
-            </li>
-        {% endfor %}
-    </ul>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<div class="container mt-4">
+        <h1>StockInsight Forum</h1>
+        <a href="{% url 'post_new' %}" class="btn btn-success">Create New Post</a>
+        <form method="get" class="mb-3">
+            <label for="title-filter" class="form-label">Filter by Title</label>
+            <input
+                    type="text"
+                    id="title-filter"
+                    name="title"
+                    class="form-control"
+                    placeholder="Search by title..."
+                    value="{{ request.GET.title }}">
+            <label for="ticker-filter" class="form-label">Filter by Ticker</label>
+            <select id="ticker-filter" name="ticker" class="form-select">
+                <option value="">All</option>
+                {% for ticker in tickers %}
+                <option value="{{ ticker }}" {% if request.GET.ticker == ticker %}selected{% endif %}>{{ ticker }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary mt-2">Filter</button>
+        </form>
+        <div class="list-group">
+            {% for post in posts %}
+            <a href="{% url 'post_detail' post.id %}" class="list-group-item list-group-item-action">
+                <h5>{{ post.title }}</h5>
+                <p>By <strong>{{ post.user }}</strong> on {{ post.created_at }}</p>
+                <p>{{ post.content }}</p>
+                <small>
+                    Related tickers:
+                    {% for ticker in post.related_tickers %}
+                            <strong>{{ ticker }}</strong>
+                        {% endfor %}
+                </small>
+            </a>
+            {% empty %}
+            <p>No posts found.</p>
+            {% endfor %}
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
