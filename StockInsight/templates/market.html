@@ -46,23 +46,22 @@
             {% endfor %}
         </div>
     {% endif %}
-
-    <!--   ARTICLES     -->
-    <div class="container testimonial-group">
+    <hr>
+    <h1 class="text-center">Newest articles</h1>
+    <div class="container testimonial-group mt-4">
         <div class="row">
-            <div class="col-xs-4">
-                {% include 'articles.html' %}
+            <div class="col">
+                <div class="row">
+                    {% include 'articles.html' %}
+                </div>
             </div>
         </div>
     </div>
-    <!---------------------->
-
-    <h2 class="text-center m-2">Posts</h2>
-    <!--  POSTS  -->
-    <div class="row mt-3">
+    <hr>
+    <h1 class="text-center">Posts</h1>
+    <div class="row mt-4">
         {% include "forum/posts.html" %}
     </div>
-    <!--------------->
 </div>
 
 {% block javascript %}
