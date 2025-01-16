@@ -14,8 +14,9 @@ import json
 import requests
 from bs4 import BeautifulSoup
 import ast
+from datetime import datetime, timedelta
 
-DISABLE_ARTICLES = True
+DISABLE_ARTICLES = False
 
 
 def login_view(request):
@@ -310,6 +311,35 @@ def fetch_articles(stocks=None):
     if DISABLE_ARTICLES:
         return []
 
+    query = ""
+    if stocks is not None:
+        query = f"{stocks.split("-")[0]}"
+
+    time = datetime.now() - timedelta(hours=24)
+    time = str(time)
+    time = time.replace(" ", "T")
+    time = time.split(".")[0]
+
+    API_KEY = "V3CqrPpcGerzNYDWXVJBAN7yrdkTmcbXImHldrbJ"
+    api_url = (f"https://api.marketaux.com/v1/news/all"
+               f"?countries=us"
+               f"&filter_entities=true"
+               f"&symbols={query}"
+               f"&limit=5"
+               f"&published_after={time}"
+               f"&api_token={API_KEY}")
+
+    response = requests.get(api_url)
+    response.raise_for_status()
+    response_json = response.json()
+    print(api_url)
+    return response_json['data']
+
+
+def fetch_articles_deprecated(stocks=None):
+    if DISABLE_ARTICLES:
+        return []
+
     query = "t=earnings report"
     if stocks is not None:
         query = f"s={stocks.split("-")[0]}"
@@ -329,11 +359,13 @@ def fetch_articles(stocks=None):
 
         for i in response_json:
             print(urlparse(i['link']).netloc)
-            i['title_image'] = get_website_logo(i['link'])
-            if urlparse(i['link']).netloc == "finance.yahoo.com":
+
+            if "finance.yahoo.com" in urlparse(i['link']).netloc:
                 i['title_image'] = "https://upload.wikimedia.org/wikipedia/commons/8/8f/Yahoo%21_Finance_logo_2021.png"
             elif urlparse(i['link']).netloc == "www.globenewswire.com":
                 i['title_image'] = "https://www.globenewswire.com/content/logo/color.svg"
+            else:
+                i['title_image'] = get_website_logo(i['link'])
 
             if len(i['content']) > 50:
                 i['content'] = i['content'][:250] + "..."
